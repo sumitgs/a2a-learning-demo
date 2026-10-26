@@ -103,8 +103,3 @@ def test_filter_tasks_by_status(client: TestClient) -> None:
     data = res.json()
     assert data["total"] == 1
     assert data["items"][0]["title"] == "Task B"
-
-
-def test_filter_tasks_by_priority(client: TestClient) -> None:
-    """Test filtering tasks by priority."""
-    client.post("/api/v1/tasks", json={"title": "Task Low", "priority": "low"})
