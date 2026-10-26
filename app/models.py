@@ -21,6 +21,14 @@ class TaskPriority(StrEnum):
     HIGH = "high"
 
 
+class SeverityLevel(StrEnum):
+    """Enumeration of task severity levels."""
+
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+
+
 class TaskBase(BaseModel):
     """Shared task attributes."""
 
@@ -44,6 +52,10 @@ class TaskBase(BaseModel):
     priority: TaskPriority = Field(
         default=TaskPriority.MEDIUM,
         description="Priority level of the task",
+    )
+    severity: SeverityLevel = Field(
+        default=SeverityLevel.MEDIUM,
+        description="Severity level of the task",
     )
     due_date: str | None = Field(
         default=None,
@@ -80,6 +92,10 @@ class TaskUpdate(BaseModel):
         default=None,
         description="Updated priority level of the task",
     )
+    severity: SeverityLevel | None = Field(
+        default=None,
+        description="Updated severity level of the task",
+    )
     due_date: str | None = Field(
         default=None,
         description="Updated due date in ISO format",
@@ -98,8 +114,3 @@ class TaskResponse(TaskBase):
 
 class TaskListResponse(BaseModel):
     """Paginated list response for tasks."""
-
-    items: list[TaskResponse]
-    total: int = Field(..., description="Total number of tasks matching the query")
-    limit: int = Field(..., description="Maximum number of items returned")
-    offset: int = Field(..., description="Offset index for pagination")
