@@ -99,4 +99,3 @@ class TaskListResponse(BaseModel):
     items: list[TaskResponse]
     total: int
     limit: int
-    offset: int
