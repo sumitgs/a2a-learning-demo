@@ -85,9 +85,9 @@ class TaskUpdate(BaseModel):
 class TaskResponse(TaskBase):
     """Response model for a single task."""
 
-    id: int
-    created_at: datetime
-    updated_at: datetime
+    id: int = Field(..., description="Unique identifier of the task")
+    created_at: datetime = Field(..., description="Timestamp when the task was created")
+    updated_at: datetime = Field(..., description="Timestamp when the task was last updated")
 
     class Config:
         from_attributes = True
@@ -96,6 +96,7 @@ class TaskResponse(TaskBase):
 class TaskListResponse(BaseModel):
     """Response model for a list of tasks."""
 
-    items: list[TaskResponse]
-    total: int
-    limit: int
+    items: list[TaskResponse] = Field(..., description="List of tasks")
+    total: int = Field(..., description="Total number of tasks matching the query")
+    limit: int = Field(..., description="Maximum number of items returned")
+    offset: int = Field(default=0, description="Number of items skipped")

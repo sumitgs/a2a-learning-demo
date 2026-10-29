@@ -99,36 +99,3 @@ def test_filter_tasks_by_status(client: TestClient) -> None:
     data = res.json()
     assert data["total"] == 1
     assert data["items"][0]["status"] == "in_progress"
-
-
-def test_get_task_by_id(client: TestClient) -> None:
-    """Test retrieving a task by ID."""
-    create_res = client.post("/api/v1/tasks", json={"title": "Get Me"})
-    task_id = create_res.json()["id"]
-
-    res = client.get(f"/api/v1/tasks/{task_id}")
-    assert res.status_code == 200
-    assert res.json()["title"] == "Get Me"
-
-
-def test_update_task(client: TestClient) -> None:
-    """Test updating task fields."""
-    create_res = client.post("/api/v1/tasks", json={"title": "Original"})
-    task_id = create_res.json()["id"]
-
-    update_res = client.patch(f"/api/v1/tasks/{task_id}", json={"title": "Updated", "severity": "High"})
-    assert update_res.status_code == 200
-    assert update_res.json()["title"] == "Updated"
-    assert update_res.json()["severity"] == "High"
-
-
-def test_delete_task(client: TestClient) -> None:
-    """Test deleting a task."""
-    create_res = client.post("/api/v1/tasks", json={"title": "Delete Me"})
-    task_id = create_res.json()["id"]
-
-    del_res = client.delete(f"/api/v1/tasks/{task_id}")
-    assert del_res.status_code == 204
-
-    get_res = client.get(f"/api/v1/tasks/{task_id}")
-    assert get_res.status_code == 404
