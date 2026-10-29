@@ -1,6 +1,7 @@
 """Pydantic request and response models for the Task Tracker API."""
 
 from enum import StrEnum
+from datetime import datetime
 
 from pydantic import BaseModel, Field
 
@@ -73,30 +74,29 @@ class TaskCreate(TaskBase):
 class TaskUpdate(BaseModel):
     """Request model for updating an existing task."""
 
-    title: str | None = Field(
-        default=None,
-        min_length=1,
-        max_length=200,
-        description="Updated title of the task",
-    )
-    description: str | None = Field(
-        default=None,
-        max_length=2000,
-        description="Updated description of the task",
-    )
-    status: TaskStatus | None = Field(
-        default=None,
-        description="Updated status of the task",
-    )
-    priority: TaskPriority | None = Field(
-        default=None,
-        description="Updated priority level of the task",
-    )
-    severity: TaskSeverity | None = Field(
-        default=None,
-        description="Updated severity level of the task",
-    )
-    due_date: str | None = Field(
-        default=None,
-        description="Updated due date in ISO format",
-    )
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = Field(default=None, max_length=2000)
+    status: TaskStatus | None = None
+    priority: TaskPriority | None = None
+    severity: TaskSeverity | None = None
+    due_date: str | None = None
+
+
+class TaskResponse(TaskBase):
+    """Response model for a single task."""
+
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class TaskListResponse(BaseModel):
+    """Response model for a list of tasks."""
+
+    items: list[TaskResponse]
+    total: int
+    limit: int
+    offset: int

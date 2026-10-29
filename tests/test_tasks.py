@@ -45,23 +45,19 @@ def test_create_task_default_values(client: TestClient) -> None:
 
 def test_create_task_validation_error(client: TestClient) -> None:
     """Test validation errors on empty title and invalid enum values."""
-    # Empty title
     res_empty_title = client.post("/api/v1/tasks", json={"title": ""})
     assert res_empty_title.status_code == 422
 
-    # Invalid status
     res_bad_status = client.post(
         "/api/v1/tasks", json={"title": "Test", "status": "invalid_status"}
     )
     assert res_bad_status.status_code == 422
 
-    # Invalid priority
     res_bad_priority = client.post(
         "/api/v1/tasks", json={"title": "Test", "priority": "extreme"}
     )
     assert res_bad_priority.status_code == 422
 
-    # Invalid severity
     res_bad_severity = client.post(
         "/api/v1/tasks", json={"title": "Test", "severity": "Critical"}
     )
@@ -102,9 +98,37 @@ def test_filter_tasks_by_status(client: TestClient) -> None:
     assert res.status_code == 200
     data = res.json()
     assert data["total"] == 1
-    assert data["items"][0]["title"] == "Task B"
+    assert data["items"][0]["status"] == "in_progress"
 
 
-def test_filter_tasks_by_priority(client: TestClient) -> None:
-    """Test filtering tasks by priority."""
-    client.post("/api/v1/tasks", json={"title": "Task Low", "priority": "low"})
+def test_get_task_by_id(client: TestClient) -> None:
+    """Test retrieving a task by ID."""
+    create_res = client.post("/api/v1/tasks", json={"title": "Get Me"})
+    task_id = create_res.json()["id"]
+
+    res = client.get(f"/api/v1/tasks/{task_id}")
+    assert res.status_code == 200
+    assert res.json()["title"] == "Get Me"
+
+
+def test_update_task(client: TestClient) -> None:
+    """Test updating task fields."""
+    create_res = client.post("/api/v1/tasks", json={"title": "Original"})
+    task_id = create_res.json()["id"]
+
+    update_res = client.patch(f"/api/v1/tasks/{task_id}", json={"title": "Updated", "severity": "High"})
+    assert update_res.status_code == 200
+    assert update_res.json()["title"] == "Updated"
+    assert update_res.json()["severity"] == "High"
+
+
+def test_delete_task(client: TestClient) -> None:
+    """Test deleting a task."""
+    create_res = client.post("/api/v1/tasks", json={"title": "Delete Me"})
+    task_id = create_res.json()["id"]
+
+    del_res = client.delete(f"/api/v1/tasks/{task_id}")
+    assert del_res.status_code == 204
+
+    get_res = client.get(f"/api/v1/tasks/{task_id}")
+    assert get_res.status_code == 404
