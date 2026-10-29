@@ -1,8 +1,9 @@
 """Pydantic request and response models for the Task Tracker API."""
 
 from enum import StrEnum
+from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
 
 
 class TaskStatus(StrEnum):
@@ -19,6 +20,14 @@ class TaskPriority(StrEnum):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
+
+
+class TaskSeverity(StrEnum):
+    """Enumeration of task severity levels."""
+
+    LOW = "Low"
+    MEDIUM = "Medium"
+    HIGH = "High"
 
 
 class TaskBase(BaseModel):
@@ -45,6 +54,10 @@ class TaskBase(BaseModel):
         default=TaskPriority.MEDIUM,
         description="Priority level of the task",
     )
+    severity: TaskSeverity = Field(
+        default=TaskSeverity.MEDIUM,
+        description="Severity level of the task",
+    )
     due_date: str | None = Field(
         default=None,
         description="Due date in ISO format (e.g. YYYY-MM-DD or ISO 8601 timestamp)",
@@ -61,45 +74,29 @@ class TaskCreate(TaskBase):
 class TaskUpdate(BaseModel):
     """Request model for updating an existing task."""
 
-    title: str | None = Field(
-        default=None,
-        min_length=1,
-        max_length=200,
-        description="Updated title of the task",
-    )
-    description: str | None = Field(
-        default=None,
-        max_length=2000,
-        description="Updated description of the task",
-    )
-    status: TaskStatus | None = Field(
-        default=None,
-        description="Updated status of the task",
-    )
-    priority: TaskPriority | None = Field(
-        default=None,
-        description="Updated priority level of the task",
-    )
-    due_date: str | None = Field(
-        default=None,
-        description="Updated due date in ISO format",
-    )
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = Field(default=None, max_length=2000)
+    status: TaskStatus | None = None
+    priority: TaskPriority | None = None
+    severity: TaskSeverity | None = None
+    due_date: str | None = None
 
 
 class TaskResponse(TaskBase):
-    """Response model representing a stored task."""
+    """Response model for a single task."""
 
-    id: int = Field(..., description="Unique task identifier")
-    created_at: str = Field(..., description="ISO 8601 creation timestamp")
-    updated_at: str = Field(..., description="ISO 8601 last update timestamp")
+    id: int = Field(..., description="Unique identifier of the task")
+    created_at: datetime = Field(..., description="Timestamp when the task was created")
+    updated_at: datetime = Field(..., description="Timestamp when the task was last updated")
 
-    model_config = ConfigDict(from_attributes=True)
+    class Config:
+        from_attributes = True
 
 
 class TaskListResponse(BaseModel):
-    """Paginated list response for tasks."""
+    """Response model for a list of tasks."""
 
-    items: list[TaskResponse]
+    items: list[TaskResponse] = Field(..., description="List of tasks")
     total: int = Field(..., description="Total number of tasks matching the query")
     limit: int = Field(..., description="Maximum number of items returned")
-    offset: int = Field(..., description="Offset index for pagination")
+    offset: int = Field(default=0, description="Number of items skipped")
