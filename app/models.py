@@ -2,7 +2,7 @@
 
 from enum import StrEnum
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
 
 
 class TaskStatus(StrEnum):
@@ -100,17 +100,3 @@ class TaskUpdate(BaseModel):
         default=None,
         description="Updated due date in ISO format",
     )
-
-
-class TaskResponse(TaskBase):
-    """Response model representing a stored task."""
-
-    id: int = Field(..., description="Unique task identifier")
-    created_at: str = Field(..., description="ISO 8601 creation timestamp")
-    updated_at: str = Field(..., description="ISO 8601 last update timestamp")
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-class TaskListResponse(BaseModel):
-    """Paginated list response for tasks."""
