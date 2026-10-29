@@ -1,4 +1,4 @@
-# Implemented fix for issue #24
+# Implemented fix for issue #26
 
 def resolve():
     return True
